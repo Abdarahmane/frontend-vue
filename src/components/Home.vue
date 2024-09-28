@@ -33,7 +33,7 @@
 .discover-btn:hover {
   transform: scale(1.05);
   background-color: #ffc107; /* Change la couleur au survol */
-  color: #fff;
+  color: #ffffff;
 }
 
 @media (max-width: 576px) {
