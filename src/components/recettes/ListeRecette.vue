@@ -1,9 +1,9 @@
 <template>
   <div class="container">
-    <h2>{{ $t('recipe_list') }}</h2>
+    <h2>{{ $t('Recipes Lists') }}</h2>
     <div class="d-flex justify-content-end mb-4">
       <router-link to="/recette/new" class="btn btn-danger">
-        <i class="fas fa-plus"></i> {{ $t('new_recipe') }}
+        <i class="fas fa-plus"></i> {{ $t('new recipe') }}
       </router-link>
     </div>
     <table class="table">
@@ -13,6 +13,7 @@
           <th scope="col">{{ $t('title') }}</th>
           <th scope="col">{{ $t('ingredients') }}</th>
           <th scope="col">{{ $t('type') }}</th>
+          <th scope="col">{{ $t('category') }}</th> <!-- New Category Column -->
           <th scope="col">{{ $t('actions') }}</th>
         </tr>
       </thead>
@@ -22,6 +23,7 @@
           <td>{{ item.titre }}</td>
           <td>{{ item.ingredients }}</td>
           <td>{{ item.type }}</td>
+          <td>{{ item.categorie }}</td> <!-- Displaying the Category -->
           <td>
             <router-link :to="`/recette/show/${item.id}`" class="btn btn-info btn-sm">
               <i class="fas fa-eye"></i> {{ $t('view') }}
