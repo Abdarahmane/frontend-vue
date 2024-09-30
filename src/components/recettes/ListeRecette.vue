@@ -2,10 +2,10 @@
   <div class="container">
     <h2>{{ $t('Recipes Lists') }}</h2>
     <div class="d-flex justify-content-end mb-4">
-      <router-link to="/recette/new" class="btn btn-danger">
-        <i class="fas fa-plus"></i> {{ $t('new recipe') }}
-      </router-link>
-    </div>
+  <router-link to="/recette/new" class="btn btn-danger">
+    <i class="fas fa-plus"></i> {{ $t('new_recipe') }} <!-- Use the correct key for New Recipe -->
+  </router-link>
+ </div>
     <table class="table">
       <thead>
         <tr>

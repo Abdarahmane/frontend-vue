@@ -1,35 +1,35 @@
 <template>
   <div class="container d-flex justify-content-center" style="min-height: 100vh;">
     <div class="col-md-6" style="margin-top: 20px;"> <!-- Adjust margin-top as needed -->
-      <h3 class="text-center">{{ $t('Add Recipe') }}</h3>
+      <h3 class="text-center">{{ $t('add_recipe') }}</h3> <!-- Updated key -->
       <form @submit.prevent="onSubmit">
         <!-- Titre -->
         <div class="mb-3">
-          <label for="titre" class="form-label">{{ $t('Title') }}</label>
+          <label for="titre" class="form-label">{{ $t('title') }}</label> <!-- Updated key -->
           <input type="text" class="form-control" id="titre" v-model="titre" required />
         </div>
 
         <!-- Ingrédients -->
         <div class="mb-3">
-          <label for="ingredients" class="form-label">{{ $t('Ingredients') }}</label>
+          <label for="ingredients" class="form-label">{{ $t('ingredients') }}</label> <!-- Updated key -->
           <input type="text" class="form-control" id="ingredients" v-model="ingredients" required />
         </div>
 
         <!-- Type de recette -->
         <div class="mb-3">
-          <label for="type" class="form-label">{{ $t('Type') }}</label>
+          <label for="type" class="form-label">{{ $t('type') }}</label> <!-- Updated key -->
           <select class="form-select" id="type" v-model="type">
-            <option value="dessert">{{ $t('type options.dessert') }}</option>
-            <option value="entree">{{ $t('type options.entree') }}</option>
-            <option value="plat">{{ $t('type options.plat') }}</option>
+            <option value="dessert">{{ $t('type_options.dessert') }}</option>
+            <option value="entree">{{ $t('type_options.entree') }}</option>
+            <option value="plat">{{ $t('type_options.plat') }}</option>
           </select>
         </div>
 
         <!-- Dropdown pour la catégorie -->
         <div class="mb-3">
-          <label for="categorie" class="form-label">{{ $t('Category') }}</label>
+          <label for="categorie" class="form-label">{{ $t('category') }}</label> <!-- Updated key -->
           <select class="form-select" id="categorie" v-model="selectedCategory" required>
-            <option value="" disabled>{{ $t('Select a Category') }}</option>
+            <option value="" disabled>{{ $t('select_category') }}</option> <!-- Updated key -->
             <option v-for="category in categories" :key="category.id" :value="category.name">
               {{ category.name }}
             </option>
@@ -37,7 +37,7 @@
         </div>
 
         <!-- Bouton d'ajout -->
-        <button class="btn btn-success w-30">{{ $t('Add Recipe') }}</button>
+        <button class="btn btn-success w-30">{{ $t('add_recipe') }}</button> <!-- Updated key -->
       </form>
     </div>
   </div>

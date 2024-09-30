@@ -2,24 +2,24 @@
   <div class="container mt-4">
     <div class="card shadow">
       <div class="card-header">
-        <h2>Ajouter une nouvelle catégorie</h2>
+        <h2>{{ $t('add_category') }}</h2>
       </div>
       <div class="card-body">
         <form @submit.prevent="ajouterCategorie">
           <div class="mb-3">
-            <label for="name" class="form-label">Nom de la catégorie :</label>
+            <label for="name" class="form-label">{{ $t('category_name') }}:</label>
             <input 
               v-model="newCategory.name" 
               id="name" 
               class="form-control" 
-              placeholder="Entrez le nom de la catégorie"
+              placeholder="{{ $t('enter_category_name') }}"
               required 
             />
           </div>
 
           <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-primary">Ajouter</button>
-            <button @click="annuler" type="button" class="btn btn-secondary">Annuler</button>
+            <button type="submit" class="btn btn-primary">{{ $t('add') }}</button>
+            <button @click="annuler" type="button" class="btn btn-secondary">{{ $t('cancel') }}</button>
           </div>
         </form>
       </div>
