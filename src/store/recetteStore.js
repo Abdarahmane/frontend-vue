@@ -1,76 +1,77 @@
 // src/store/recetteStore.js
 import { defineStore } from "pinia";
-import { reactive } from "vue";
-import axios from '../axios'; // Import your Axios instance
+import axios from "axios";
+import { useCategoryStore } from "./categoryStore"; // Import category store
 
-export const useRecetteStore = defineStore("recetteStore", {
+export const useRecetteStore = defineStore("recettes", {
   state: () => ({
-    recettes: reactive([]), // Start with an empty array to hold fetched recipes
+    recettes: [],
   }),
-  
+
   actions: {
-    // Fetch all recettes from the backend
-    async fetchRecettes() {
+    // Load recettes from the API
+    async loadDataFromApi() {
       try {
-        const response = await axios.get('/recettes'); // Adjust the endpoint based on your backend
-        this.recettes = response.data; // Assuming the response contains the array of recettes
+        const response = await axios.get("http://localhost:3000/api/recipes");
+        this.recettes = response.data; // Assurez-vous que `response.data` contient `categorie`
       } catch (error) {
-        console.error('Error fetching recettes:', error);
+        console.error("Error fetching recettes:", error);
+        this.recettes = [];
       }
     },
 
-    // Ajout d'une nouvelle recette
-    async add(recette) {
+    // Add a new recette
+    async addRecette(recette) {
       try {
-        const response = await axios.post('/recettes', recette); // Adjust the endpoint
-        this.recettes.push({ ...response.data }); // Assuming the response contains the added recette
+        const response = await axios.post("http://localhost:3000/api/recipes", recette);
+        this.recettes.push(response.data); // Assurez-vous que votre API retourne la recette ajoutée
       } catch (error) {
-        console.error('Error adding recette:', error);
+        console.error("Error adding recette: ", error);
+        // Gérez l'erreur comme vous le souhaitez
       }
     },
 
-    // Modification d'une recette
-    async edit(id, recette) {
+    // Delete a recette
+    async deleteRecette(id) {
       try {
-        await axios.put(`/recettes/${id}`, recette); // Adjust the endpoint
-        const index = this.recettes.findIndex((r) => r.id === id);
-        if (index !== -1) this.recettes[index] = { ...recette, id };
+        await axios.delete(`http://localhost:3000/api/recipes/${id}`);
+        this.recettes = this.recettes.filter((recette) => recette.id !== id); // Reload recettes after deletion
       } catch (error) {
-        console.error('Error editing recette:', error);
+        console.error("Error deleting recette:", error);
       }
     },
 
-    // Suppression d'une recette
-    async destroy(id) {
+    // Update an existing recette
+    async updateRecette(updatedRecette) {
       try {
-        await axios.delete(`/recettes/${id}`); // Adjust the endpoint
-        const index = this.recettes.findIndex((recette) => recette.id === id);
+        const response = await axios.put(`http://localhost:3000/api/recipes/${updatedRecette.id}`, updatedRecette);
+        const index = this.recettes.findIndex((r) => r.id === updatedRecette.id);
         if (index !== -1) {
-          this.recettes.splice(index, 1);
+          this.recettes[index] = { ...updatedRecette, id: updatedRecette.id };
         }
+        console.log('Update response:', response.data); // Log the response
       } catch (error) {
-        console.error('Error deleting recette:', error);
+        console.error("Error updating recette:", error.response ? error.response.data : error);
       }
     },
+    
 
-    // Récupérer une recette par ID
-    async getById(id) {
-      try {
-        const response = await axios.get(`/recettes/${id}`); // Adjust the endpoint
-        return response.data; // Assuming the response contains the recette
-      } catch (error) {
-        console.error('Error fetching recette by ID:', error);
-      }
+    // Get a recette by ID (no getter)
+    getById(id) {
+      return this.recettes.find((recette) => recette.id === id);
     },
 
-    // Filtrer les recettes par categoryId
-    getByCategoryId(categoryId) {
-      return this.recettes.filter((recette) => recette.categoryId === categoryId);
-    },
+    // Get recettes with category names based on category_id
+    getRecettesWithCategoryNames() {
+      const categoryStore = useCategoryStore(); // Access the category store
 
-    // Vérifier si une recette existe
-    exists(id) {
-      return this.recettes.some((recette) => recette.id === id);
-    }
+      return this.recettes.map((recette) => {
+        const category = categoryStore.getCategoryById(recette.category_id);
+        return {
+          ...recette,
+          categoryName: category ? category.name : "Unknown", // Add category name or fallback
+        };
+      });
+    },
   },
 });

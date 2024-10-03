@@ -13,7 +13,7 @@
         </div>
         <div class="mb-3">
           <label for="type" class="form-label">{{ $t('type') }}</label>
-          <select class="form-control" id="type" v-model="recette.type">
+          <select class="form-select" id="type" v-model="recette.type" required>
             <option value="dessert">{{ $t('dessert') }}</option>
             <option value="entree">{{ $t('entree') }}</option>
             <option value="plat">{{ $t('dish') }}</option>
@@ -23,15 +23,15 @@
         <!-- Dropdown for categories -->
         <div class="mb-3">
           <label for="categorie" class="form-label">{{ $t('Category') }}</label>
-          <select class="form-select" id="categorie" v-model="recette.categorie" required>
+          <select class="form-select" id="categorie" v-model="recette.category" required>
             <option value="" disabled>{{ $t('Select a Category') }}</option>
-            <option v-for="category in categories" :key="category.id" :value="category.name">
+            <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.name }}
             </option>
           </select>
         </div>
 
-        <button class="btn btn-success w-30">{{ $t('modify') }}</button>
+        <button class="btn btn-success w-100">{{ $t('modify') }}</button>
       </form>
 
       <div class="d-flex justify-content-end mt-3">
@@ -47,10 +47,10 @@
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useRecetteStore } from '../../store/recetteStore';
-import { useCategoryStore } from '../../store/categoryStore'; // Import category store
+import { useCategoryStore } from '../../store/categoryStore';
 
 const store = useRecetteStore();
-const categoryStore = useCategoryStore(); // Use category store
+const categoryStore = useCategoryStore();
 const router = useRouter();
 const route = useRoute();
 
@@ -58,29 +58,58 @@ const recette = ref({
   titre: '',
   ingredients: '',
   type: '',
-  categorie: '', // Add category field
+  category: '', // Use ID for category
 });
 
-const categories = ref([]); // Reference for categories
+const categories = ref([]);
+const isLoading = ref(true); // Loading state
 
-// Fetch categories on component mount
-onMounted(() => {
-  const id = parseInt(route.params.id, 10);
-  const existingRecette = store.getById(id);
-  if (existingRecette) {
-    recette.value = { ...existingRecette };
-  } else {
-    router.push('/recette-list');
+// Fetch categories and existing recipe on mount
+onMounted(async () => {
+  try {
+    await categoryStore.loadDataFromApi();
+    const id = parseInt(route.params.id, 10);
+    const existingRecette = store.getById(id);
+    
+    if (existingRecette) {
+      recette.value = { ...existingRecette };
+    } else {
+      router.push('/recette-list');
+    }
+
+    categories.value = categoryStore.categories; // Populate categories
+  } catch (error) {
+    console.error('Error loading data:', error);
+    // Optionally, you can display an error message to the user
+  } finally {
+    isLoading.value = false; // Stop loading state
   }
-  categories.value = categoryStore.categories; // Populate categories
 });
 
-const onSubmit = () => {
-  store.edit(recette.value.id, recette.value);
-  router.push('/recette-list');
+const onSubmit = async () => {
+  try {
+    const updatedRecette = {
+      ...recette.value, // Assuming recette.value has the necessary fields
+      category_id: recette.value.category, // Ensure this matches your API structure
+      id: parseInt(route.params.id, 10), // Make sure the ID is included
+    };
+
+    // Call the updateRecette action
+    await store.updateRecette(updatedRecette);
+
+    // Navigate to the list of recettes after a successful update
+    router.push('/recette-list');
+  } catch (error) {
+    console.error('Error updating recette:', error);
+    // Optionally display an error message to the user
+  }
 };
+
 </script>
 
 <style scoped>
 /* Optional: You can add some custom styles here if needed */
+.btn-success {
+  margin-top: 10px;
+}
 </style>

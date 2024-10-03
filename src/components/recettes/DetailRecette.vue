@@ -1,7 +1,7 @@
 <template>
   <div class="container d-flex flex-column align-items-center mt-5">
     <h2>{{ $t('Recipes Details') }}</h2>
-    <form class="col-md-6">
+    <form class="col-md-6" v-if="recette">
       <div class="mb-3">
         <label for="titre" class="form-label"><strong>{{ $t('title') }}</strong></label>
         <input type="text" class="form-control" id="titre" v-model="recette.titre" readonly />
@@ -18,38 +18,49 @@
       </div>
 
       <div class="mb-3">
-        <label for="categorie" class="form-label"><strong>{{ $t('category') }}</strong></label>
-        <input type="text" class="form-control" id="categorie" v-model="recette.categorie" readonly />
-      </div>
-
-      <div v-if="!recette">
-        <p>{{ $t('recipe_not_found') }}</p>
+        <label for="category" class="form-label"><strong>{{ $t('category') }}</strong></label>
+        <input type="text" class="form-control" id="category" :value="getCategoryName(recette.category_id)" readonly />
       </div>
 
       <div class="d-flex justify-content-end">
         <router-link to="/recette-list" class="btn btn-secondary mt-3">{{ $t('back to list') }}</router-link>
       </div>
     </form>
+
+    <div v-else>
+      <p>{{ $t('recipe_not_found') }}</p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { useRecetteStore } from '@/store/recetteStore';
+import { useCategoryStore } from '@/store/categoryStore'; // Import the category store
 
 const route = useRoute();
-const store = useRecetteStore();
+const recetteStore = useRecetteStore();
+const categoryStore = useCategoryStore();
 const recette = ref(null);
 
-onMounted(() => {
+onMounted(async () => {
+  await recetteStore.loadDataFromApi(); // Load recipes from the API
   const id = parseInt(route.params.id);
-  recette.value = store.getById(id);
+  recette.value = recetteStore.recettes.find(rec => rec.id === id) || null;
+
+  console.log('Recette récupérée:', recette.value); // Log the retrieved recipe
 });
+
+// Function to get the category name from the category store
+const getCategoryName = (categoryId) => {
+  const category = categoryStore.categories.find(cat => cat.id === categoryId);
+  return category ? category.name : 'Unknown'; // Return 'Unknown' if the category is not found
+};
 </script>
 
 <style scoped>
 .container {
-  margin-top: 20px; /* Adjust as needed */
+  margin-top: 20px; /* Adjust if necessary */
 }
 </style>

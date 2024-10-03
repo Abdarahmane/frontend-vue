@@ -2,18 +2,18 @@
   <div class="container">
     <h2>{{ $t('Recipes Lists') }}</h2>
     <div class="d-flex justify-content-end mb-4">
-  <router-link to="/recette/new" class="btn btn-danger">
-    <i class="fas fa-plus"></i> {{ $t('new_recipe') }} <!-- Use the correct key for New Recipe -->
-  </router-link>
- </div>
-    <table class="table">
+      <router-link to="/recette/new" class="btn btn-danger">
+        <i class="fas fa-plus"></i> {{ $t('new_recipe') }}
+      </router-link>
+    </div>
+    <table class="table table-striped">
       <thead>
         <tr>
           <th scope="col">#</th>
           <th scope="col">{{ $t('title') }}</th>
           <th scope="col">{{ $t('ingredients') }}</th>
           <th scope="col">{{ $t('type') }}</th>
-          <th scope="col">{{ $t('category') }}</th> <!-- New Category Column -->
+          <th scope="col">{{ $t('category') }}</th>
           <th scope="col">{{ $t('actions') }}</th>
         </tr>
       </thead>
@@ -23,7 +23,7 @@
           <td>{{ item.titre }}</td>
           <td>{{ item.ingredients }}</td>
           <td>{{ item.type }}</td>
-          <td>{{ item.categorie }}</td> <!-- Displaying the Category -->
+          <td>{{ getCategoryName(item.category_id) }}</td>
           <td>
             <router-link :to="`/recette/show/${item.id}`" class="btn btn-info btn-sm">
               <i class="fas fa-eye"></i> {{ $t('view') }}
@@ -31,7 +31,7 @@
             <router-link :to="`/recette/edit/${item.id}`" class="btn btn-warning btn-sm">
               <i class="fas fa-edit"></i> {{ $t('edit') }}
             </router-link>
-            <button @click="deleteRecette(item.id)" class="btn btn-danger btn-sm">
+            <button @click="confirmDelete(item.id)" class="btn btn-danger btn-sm">
               <i class="fas fa-trash"></i> {{ $t('delete') }}
             </button>
           </td>
@@ -42,17 +42,58 @@
 </template>
 
 <script setup>
+import { onMounted, ref } from "vue";
 import { useRecetteStore } from '@/store/recetteStore';
+import { useCategoryStore } from '@/store/categoryStore';
 
 const store = useRecetteStore();
+const categoryStore = useCategoryStore();
 
-const deleteRecette = (id) => {
-  store.destroy(id);
+const isLoading = ref(true);
+
+onMounted(async () => {
+  try {
+    await Promise.all([
+      store.loadDataFromApi(),
+      categoryStore.loadDataFromApi()
+    ]);
+  } catch (error) {
+    console.error('Error loading data:', error);
+    // You might want to show an error message to the user
+  } finally {
+    isLoading.value = false;
+  }
+});
+
+// Function to get category name by ID
+const getCategoryName = (category_id) => {
+  const category = categoryStore.categories.find(cat => cat.id === category_id);
+  return category ? category.name : 'Unknown';
+};
+
+// Function to confirm deletion
+const confirmDelete = (id) => {
+  if (confirm($t('confirm_delete'))) {
+    deleteRecette(id);
+  }
+};
+
+// Function to delete a recette
+const deleteRecette = async (id) => {
+  try {
+    await store.deleteRecette(id);
+  } catch (error) {
+    console.error('Error deleting recette:', error);
+    // Show an error message to the user if needed
+  }
 };
 </script>
 
 <style scoped>
 .btn-sm {
   margin: 0 2px;
+}
+.table-striped tbody tr:nth-of-type(odd) {
+  background-color: #f9f9f9;
 }
 </style>

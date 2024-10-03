@@ -36,10 +36,16 @@
 </template>
 
 <script setup>
+import { ref ,onMounted ,computed } from "vue";
 import { useCategoryStore } from '@/store/categoryStore';
+import { useRouter } from 'vue-router';
 
 const store = useCategoryStore();
+const router = useRouter();
 
+onMounted(() => {
+ store.loadDataFromApi()
+});
 // Function to confirm deletion
 const confirmDelete = (id) => {
   if (confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ?')) {
@@ -51,6 +57,8 @@ const confirmDelete = (id) => {
 const deleteCategory = (id) => {
   store.deleteCategory(id); // Make sure this method exists in your store
 };
+
+
 </script>
 
 <style scoped>

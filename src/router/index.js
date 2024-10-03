@@ -10,7 +10,7 @@ import DetailRecette from '../components/recettes/DetailRecette.vue';
 import ListeCategorie from '../components/categories/ListeCategorie.vue';
 import AjoutCategorie from '../components/categories/AjoutCategorie.vue';
 import ModifieCategorie from '../components/categories/ModifieCategorie.vue';
-import DetailCategorie from '../components/categories/DetailCategorie.vue'; // Fix: Renamed and added missing import
+import DetailCategorie from '../components/categories/DetailCategorie.vue';
 
 // Définition des routes
 const routes = [
@@ -53,13 +53,15 @@ const routes = [
   },
   {
     path: '/category/show/:id',
-    name: 'DetailCategorie', // Fix: Consistent naming
-    component: DetailCategorie, // Fix: Corrected component name and import
+    name: 'DetailCategorie',
+    component: DetailCategorie,
+    props: true,
   },
   {
     path: '/category/edit/:id',
-    name: 'ModifieCategorie', // Fix: Consistent naming
-    component: ModifieCategorie, // Fix: Corrected component name and import
+    name: 'ModifieCategorie',
+    component: ModifieCategorie,
+    props: true,
   },
   {
     path: "/categorie/:categoryId/recettes",
@@ -68,6 +70,7 @@ const routes = [
     props: true,
   },
 ];
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

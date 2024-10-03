@@ -1,66 +1,60 @@
 // src/store/categorieStore.js
 import { defineStore } from "pinia";
-import { ref } from "vue";
-import axios from '../axios'; // Import your Axios instance
+import axios from "axios"; // Assurez-vous d'utiliser votre instance Axios
 
-export const useCategoryStore = defineStore("categorieStore", () => {
-  const categories = ref([]); // Start with an empty array to hold fetched categories
+export const useCategoryStore = defineStore("categorieStore", {
+  state: () => ({
+    categories: [], // Initialement un tableau vide
+  }),
 
-  // Fetch all categories from the backend
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get('/categories'); // Adjust the endpoint based on your backend
-      categories.value = response.data; // Assuming the response contains the array of categories
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
-  };
-
-  // Actions pour ajouter, modifier, supprimer et obtenir une catégorie
-  const addCategory = async (category) => {
-    try {
-      const response = await axios.post('/categories', category); // Adjust the endpoint
-      categories.value.push({ ...response.data }); // Assuming the response contains the added category
-    } catch (error) {
-      console.error('Error adding category:', error);
-    }
-  };
-
-  const editCategory = async (id, updatedCategory) => {
-    try {
-      await axios.put(`/categories/${id}`, updatedCategory); // Adjust the endpoint
-      const index = categories.value.findIndex((cat) => cat.id === id);
-      if (index !== -1) {
-        categories.value[index] = { ...updatedCategory, id };
+  actions: {
+    // Charger les catégories à partir de l'API
+    async loadDataFromApi() {
+      try {
+        const response = await axios.get("http://localhost:3000/api/categories"); // Ajustez l'URL en fonction de votre backend
+        this.categories = response.data; // Assurez-vous que la réponse contient un tableau de catégories
+      } catch (error) {
+        console.error("Erreur lors de la récupération des catégories :", error);
+        this.categories = []; // Réinitialiser à un tableau vide en cas d'erreur
       }
-    } catch (error) {
-      console.error('Error editing category:', error);
-    }
-  };
+    },
 
-  const deleteCategory = async (id) => {
-    try {
-      await axios.delete(`/categories/${id}`); // Adjust the endpoint
-      categories.value = categories.value.filter((category) => category.id !== id);
-    } catch (error) {
-      console.error('Error deleting category:', error);
-    }
-  };
+    // Ajouter une nouvelle catégorie
+    async addCategory(category) {
+      try {
+        const response = await axios.post("http://localhost:3000/api/categories", { name: category.name }); // Ajustez l'URL
+        this.categories.push(response.data); // Assurez-vous que la réponse contient la catégorie ajoutée
+      } catch (error) {
+        console.error("Erreur lors de l'ajout de la catégorie :", error);
+      }
+    },
 
-  const getCategoryById = (id) => {
-    return categories.value.find((category) => category.id === id);
-  };
+    // Modifier une catégorie existante
+    async editCategory(id, updatedCategory) {
+      try {
+        await axios.put(`http://localhost:3000/api/categories/${id}`, updatedCategory); // Ajustez l'URL
+        const index = this.categories.findIndex((cat) => cat.id === id);
+        if (index !== -1) {
+          this.categories[index] = { ...updatedCategory, id };
+        }
+      } catch (error) {
+        console.error("Erreur lors de la modification de la catégorie :", error);
+      }
+    },
 
-  // Fetch categories when store is initialized
-  fetchCategories();
+    // Supprimer une catégorie
+    async deleteCategory(id) {
+      try {
+        await axios.delete(`http://localhost:3000/api/categories/${id}`); // Ajustez l'URL
+        this.categories = this.categories.filter((category) => category.id !== id);
+      } catch (error) {
+        console.error("Erreur lors de la suppression de la catégorie :", error);
+      }
+    },
 
-  // Retourne les catégories et les actions
-  return {
-    categories,
-    addCategory,
-    editCategory,
-    deleteCategory,
-    getCategoryById,
-    fetchCategories, // Expose fetchCategories for component use
-  };
+    // Obtenir une catégorie par ID
+    getCategoryById(id) {
+      return this.categories.find((category) => category.id === id);
+    },
+  },
 });
